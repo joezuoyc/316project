@@ -47,8 +47,8 @@ def about():
 @app.route("/register", methods=['GET', 'POST'])
 def register():
 	form = RegistrationForm()
-	# if current_user.is_authenticated:
-	# 	return redirect(url_for('main'))
+	if current_user.is_authenticated:
+		return redirect(url_for('main'))
 	if form.validate_on_submit():
 		hashed_pw = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
 		user = User(username=form.username.data, email=form.email.data, password=hashed_pw)
@@ -61,15 +61,15 @@ def register():
 @app.route("/login", methods=['GET', 'POST'])
 def login():
 	form = LoginForm()
-	# if current_user.is_authenticated:
-	# 	return redirect(url_for('main'))
+	if current_user.is_authenticated:
+		return redirect(url_for('main'))
 	if form.validate_on_submit():
 		user = User.query.filter_by(email=form.email.data).first()
 		# check if login email and pw is ocrrect
 		if user and bcrypt.check_password_hash(user.password, form.password.data):
 			login_user(user, remember=form.remember.data)
 			next_page = request.args.get('next')
-			return redirect(next_page) if next_page else redirect(url_for('home'))
+			return redirect(next_page) if next_page else redirect(url_for('main'))
 		else:
 			flash('Login Unsuccessful. Please check email and password', 'danger')
 	return render_template('login.html', title='Login', form=form)
