@@ -1,5 +1,5 @@
   
-from flask import render_template, url_for, flash, redirect, request
+from flask import render_template, url_for, flash, redirect, request, abort
 from scheduler import app, db, bcrypt
 from scheduler.forms import RegistrationForm, LoginForm, UpdateAccountForm, AnnouncementForm
 from scheduler.models import User, Announcement
@@ -37,6 +37,7 @@ from PIL import Image
 @app.route('/') # home page of the website, login here
 def home():
 	return render_template('home.html')
+	
 @app.route('/main') # main user page
 def main():
 	announcements = Announcement.query.all()
@@ -133,9 +134,42 @@ def new_announcement():
 		db.session.commit()
 		flash('Your accoucement has been created', 'success')
 		return redirect(url_for('main'))
-	return render_template('new_announcement.html', title='New accouncement', form = form)
+	return render_template('new_announcement.html', title='New accouncement', form = form, legend = 'New Announcement')
 
 @app.route("/announcements/<announcement_id>")
 def announcement(announcement_id):
 	announcement = Announcement.query.get_or_404(announcement_id)
 	return render_template('announcement.html', title= announcement.title, announcement = announcement)
+
+
+# Update announcement content
+@app.route("/announcements/<announcement_id>/update", methods=['GET', 'POST'])
+@login_required
+
+def update_announcement(announcement_id):
+	announcement = Announcement.query.get_or_404(announcement_id)
+	if announcement.author != current_user:
+		abort(403)
+	form = AnnouncementForm()
+	if form.validate_on_submit():
+		announcement.title = form.title.data
+		announcement.content = form.content.data
+		db.session.commit()
+		flash('Your post has been updated!', 'success')
+		return redirect(url_for('announcement',announcement_id = announcement.id))
+	elif request.method == 'GET':
+		form.title.data = announcement.title
+		form.content.data = announcement.content
+	return render_template('new_announcement.html', title= 'Update Annoucnement' , 
+								form = form, legend = 'Update Annoucnement')
+
+@app.route("/announcement/<int:announcement_id>/delete", methods=['POST'])
+@login_required
+def delete_announcement(announcement_id):
+    announcement = Annoucnement.query.get_or_404(announcement_id)
+    if announcement.author != current_user:
+        abort(403)
+    db.session.delete(post)
+    db.session.commit()
+    flash('Your announcement has been deleted!', 'success')
+    return redirect(url_for('main'))
