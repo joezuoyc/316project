@@ -10,7 +10,7 @@
               <a class="mr-2" href="#">{{ announcement.author.username }}</a>
               <small class="text-muted">{{announcement.date_posted.strftime('%m-%d-%Y') }}</small>
             </div>
-            <h2><a class="article-title" href="#">{{ announcement.title }}</a></h2>
+            <h2><a class="article-title" href="{{url_for('announcement', announcement_id = announcement.id)}}">{{ announcement.title }}</a></h2>
             <p class="article-content">{{ announcement.content }}</p>
           </div>
         </article>

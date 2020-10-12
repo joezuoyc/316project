@@ -36,7 +36,7 @@ from PIL import Image
 
 @app.route('/') # home page of the website, login here
 def home():
-	return render_template('home.html', posts=posts)
+	return render_template('home.html')
 @app.route('/main') # main user page
 def main():
 	announcements = Announcement.query.all()
@@ -135,3 +135,7 @@ def new_announcement():
 		return redirect(url_for('main'))
 	return render_template('new_announcement.html', title='New accouncement', form = form)
 
+@app.route("/announcements/<announcement_id>")
+def announcement(announcement_id):
+	announcement = Announcement.query.get_or_404(announcement_id)
+	return render_template('announcement.html', title= announcement.title, announcement = announcement)
