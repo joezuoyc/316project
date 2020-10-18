@@ -16,6 +16,8 @@ class RegistrationForm(FlaskForm):
 					validators =[DataRequired(), EqualTo('password')])
 	logged_hours = DecimalField('Hours Worked',
 					validators=[DataRequired()])
+	user_identity = StringField('User Identity', validators = [DataRequired()])
+	status_active = BooleanField('Active Now?')
 
 	submit = SubmitField('Signup')
 
