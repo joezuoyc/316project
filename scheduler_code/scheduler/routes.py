@@ -40,7 +40,8 @@ def home():
 	
 @app.route('/main') # main user page
 def main():
-	announcements = Announcement.query.all()
+	page = request.args.get('page', 1, type = int)
+	announcements = Announcement.query.paginate(per_page = 5)
 	return render_template('main.html', announcements =announcements, title = 'Main')
 
 
