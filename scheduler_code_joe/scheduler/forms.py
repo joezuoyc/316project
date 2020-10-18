@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from flask_login import current_user
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, DecimalField
 from wtforms.validators import DataRequired, Length, Email, EqualTo
 import email_validator
 from scheduler.models import User
@@ -14,6 +14,9 @@ class RegistrationForm(FlaskForm):
 	password = PasswordField('Password', validators = [DataRequired()] )
 	confirm_password = PasswordField('Confirm Password', 
 					validators =[DataRequired(), EqualTo('password')])
+	logged_hours = DecimalField('Hours Worked',
+					validators=[DataRequired()])
+
 	submit = SubmitField('Signup')
 
 
