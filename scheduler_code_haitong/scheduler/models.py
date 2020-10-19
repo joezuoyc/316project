@@ -43,8 +43,6 @@ class Poll(db.Model):
         return f"Post('{self.title}', '{self.date_posted}')"
 
 
-
-
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
