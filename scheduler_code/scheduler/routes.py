@@ -1,8 +1,8 @@
   
 from flask import render_template, url_for, flash, redirect, request, abort
 from scheduler import app, db, bcrypt
-from scheduler.forms import RegistrationForm, LoginForm, UpdateAccountForm, AnnouncementForm
-from scheduler.models import User, Announcement
+from scheduler.forms import RegistrationForm, LoginForm, UpdateAccountForm, AnnouncementForm, TaskForm
+from scheduler.models import User, Announcement, Task
 from flask_login import login_user, current_user, logout_user, login_required
 import secrets
 import os
@@ -42,7 +42,6 @@ def home():
 def main():
 	page = request.args.get('page', 1, type = int)
 	announcements = Announcement.query.paginate(per_page = 5)
-	return render_template('main.html', announcements =announcements, title = 'Main')
 
 
 @app.route('/about')
@@ -174,3 +173,24 @@ def delete_announcement(announcement_id):
     db.session.commit()
     flash('Your announcement has been deleted!', 'success')
     return redirect(url_for('main'))
+
+@app.route("/tasks/new", methods=['GET', 'POST'])
+@login_required
+def new_task():
+	form = TaskForm()
+	if form.validate_on_submit():
+		task = Task(title = form.title.data, content = form.content.data, author = current_user)
+		db.session.add(task)
+		db.session.commit()
+		flash('Your task has been assigned', 'success')
+		return redirect(url_for('main'))
+	return render_template('new_task.html', title='New task', form = form)
+
+
+@app.route("/tasks/<task_id>")
+def task(task_id):
+	task = Task.query.get_or_404(task_id)
+	return render_template('task.html', title= task.title, task = task)
+
+#db.create_all()
+#db.session.commit()
