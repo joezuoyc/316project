@@ -1,5 +1,4 @@
-  
-from flask import render_template, url_for, flash, redirect, request
+from flask import render_template, url_for, flash, redirect, request, abort
 from scheduler import app, db, bcrypt
 from scheduler.forms import RegistrationForm, LoginForm, UpdateAccountForm, AnnouncementForm, TaskForm
 from scheduler.models import User, Announcement, Task
@@ -14,7 +13,8 @@ def home():
 	return render_template('home.html')
 @app.route('/main') # main user page
 def main():
-	announcements = Announcement.query.all()
+	page = request.args.get('page', 1, type = int)
+	announcements = Announcement.query.paginate(per_page = 5)
 	tasks = Task.query.all()
 	return render_template('main.html', announcements =announcements, tasks= tasks, title = 'Main')
 
@@ -109,7 +109,7 @@ def new_announcement():
 		db.session.commit()
 		flash('Your accoucement has been created', 'success')
 		return redirect(url_for('main'))
-	return render_template('new_announcement.html', title='New accouncement', form = form)
+	return render_template('new_announcement.html', title='New accouncement', form = form, legend = 'New Announcement')
 
 @app.route("/announcements/<announcement_id>")
 def announcement(announcement_id):
@@ -133,6 +133,64 @@ def new_task():
 def task(task_id):
 	task = Task.query.get_or_404(task_id)
 	return render_template('task.html', title= task.title, task = task)
+
+@app.route("/announcements/<announcement_id>/update", methods=['GET', 'POST'])
+@login_required
+
+def update_announcement(announcement_id):
+	announcement = Announcement.query.get_or_404(announcement_id)
+	if announcement.author != current_user:
+		abort(403)
+	form = AnnouncementForm()
+	if form.validate_on_submit():
+		announcement.title = form.title.data
+		announcement.content = form.content.data
+		db.session.commit()
+		flash('Your post has been updated!', 'success')
+		return redirect(url_for('announcement',announcement_id = announcement.id))
+	elif request.method == 'GET':
+		form.title.data = announcement.title
+		form.content.data = announcement.content
+	return render_template('new_announcement.html', title= 'Update Annoucnement' , 
+								form = form, legend = 'Update Annoucnement')
+
+@app.route("/announcement/<int:announcement_id>/delete", methods=['POST'])
+@login_required
+def delete_announcement(announcement_id):
+    announcement = Annoucnement.query.get_or_404(announcement_id)
+    if announcement.author != current_user:
+        abort(403)
+    db.session.delete(post)
+    db.session.commit()
+    flash('Your announcement has been deleted!', 'success')
+    return redirect(url_for('main'))
+
+
+@app.route("/poll/new", methods=['GET', 'POST'])
+@login_required
+def new_poll():
+	form = AnnouncementForm()
+	if form.validate_on_submit():
+		poll = Poll(title = form.title.data, content = form.content.data, author = current_user)
+		db.session.add(poll)
+		db.session.commit()
+		flash('Your poll has been created', 'success')
+		return redirect(url_for('main'))
+	return render_template('new_poll.html', title='New poll', form = form, legend = 'New Poll')
+
+
+@app.route("/task/new", methods=['GET', 'POST'])
+@login_required
+def new_task():
+	form = AnnouncementForm()
+	if form.validate_on_submit():
+		task = Task(title = form.title.data, content = form.content.data, author = current_user)
+		db.session.add(poll)
+		db.session.commit()
+		flash('A new task has been created', 'success')
+		return redirect(url_for('main'))
+	return render_template('new_task.html', title='New task', form = form, legend = 'New Task')
+
 
 db.create_all()
 db.session.commit()

@@ -17,9 +17,12 @@ class User(db.Model, UserMixin):
     announcement = db.relationship('Announcement', backref='author', lazy=True)
     poll = db.relationship('Poll', backref='author', lazy=True)
     task = db.relationship('Task', backref='author', lazy=True)
-    logged_hours = db.Column(db.Float)
+    logged_hours = db.Column(db.Float, lazy = True)
+    user_identity = db.Column(db.String(2000), lazy = True)
+    status_active = db.Column(db.Boolean, lazy = True)
+
     def __repr__(self):
-        return f"User('{self.username}', '{self.email}', '{self.image_file}', '{self.logged_hours}')"
+        return f"User('{self.username}', '{self.email}', '{self.image_file}', '{self.logged_hours}', '{self.user_identity}','{self.status_active}')"
 
 
 class Announcement(db.Model):
