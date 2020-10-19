@@ -43,8 +43,6 @@ class Poll(db.Model):
         return f"Post('{self.title}', '{self.date_posted}')"
 
 
-
-
 class Task(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
@@ -54,3 +52,15 @@ class Task(db.Model):
 
     def __repr__(self):
         return f"Post('{self.title}', '{self.date_posted}')"
+
+def init_db():
+    db.create_all()
+
+    # Create a test task
+    new_task = Task(1, 'a', 'Oct 3rd 2020', 'nothing')
+    db.session.add(new_task)
+    db.session.commit()
+
+
+if __name__ == '__main__':
+    init_db()

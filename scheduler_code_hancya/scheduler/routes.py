@@ -1,37 +1,12 @@
   
 from flask import render_template, url_for, flash, redirect, request
 from scheduler import app, db, bcrypt
-from scheduler.forms import RegistrationForm, LoginForm, UpdateAccountForm, AnnouncementForm
-from scheduler.models import User, Announcement
+from scheduler.forms import RegistrationForm, LoginForm, UpdateAccountForm, AnnouncementForm, TaskForm
+from scheduler.models import User, Announcement, Task
 from flask_login import login_user, current_user, logout_user, login_required
 import secrets
 import os
 from PIL import Image
-
-# posts = [
-
-# {
-
-# 	'author':'atsushi', 
-# 	'title':'blog post 1',
-# 	'date': 'Oct 3rd 2020',
-# 	'content':'test1'
-
-# },
-
-
-# {
-
-# 	'author':'hanyca', 
-# 	'title':'blog post 2',
-# 	'date': 'Oct 3rd 2020',
-# 	'content':'test2'
-
-# }
-
-# ]
-
-
 
 
 @app.route('/') # home page of the website, login here
@@ -40,7 +15,8 @@ def home():
 @app.route('/main') # main user page
 def main():
 	announcements = Announcement.query.all()
-	return render_template('main.html', announcements =announcements, title = 'Main')
+	tasks = Task.query.all()
+	return render_template('main.html', announcements =announcements, tasks= tasks, title = 'Main')
 
 
 @app.route('/about')
@@ -139,3 +115,41 @@ def new_announcement():
 def announcement(announcement_id):
 	announcement = Announcement.query.get_or_404(announcement_id)
 	return render_template('announcement.html', title= announcement.title, announcement = announcement)
+
+@app.route("/tasks/new", methods=['GET', 'POST'])
+@login_required
+def new_task():
+	form = TaskForm()
+	if form.validate_on_submit():
+		task = Task(title = form.title.data, content = form.content.data, author = current_user)
+		db.session.add(task)
+		db.session.commit()
+		flash('Your task has been assigned', 'success')
+		return redirect(url_for('main'))
+	return render_template('new_task.html', title='New task', form = form)
+
+
+@app.route("/tasks/<task_id>")
+def task(task_id):
+	task = Task.query.get_or_404(task_id)
+	return render_template('task.html', title= task.title, task = task)
+
+db.create_all()
+db.session.commit()
+
+#posts = [
+#{
+# 	'author':'atsushi', 
+# 	'title':'blog post 1',
+# 	'date': 'Oct 3rd 2020',
+# 	'content':'test1'
+# },
+# {
+# 	'author':'hanyca', 
+# 	'title':'blog post 2',
+# 	'date': 'Oct 3rd 2020',
+# 	'content':'test2'
+# }
+#]
+
+#task = Task(posts)
