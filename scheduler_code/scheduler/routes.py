@@ -144,10 +144,10 @@ def update_announcement(announcement_id):
 @app.route("/announcement/<int:announcement_id>/delete", methods=['POST'])
 @login_required
 def delete_announcement(announcement_id):
-    announcement = Annoucnement.query.get_or_404(announcement_id)
+    announcement = Announcement.query.get_or_404(announcement_id)
     if announcement.author != current_user:
         abort(403)
-    db.session.delete(post)
+    db.session.delete(announcement)
     db.session.commit()
     flash('Your announcement has been deleted!', 'success')
     return redirect(url_for('main'))
