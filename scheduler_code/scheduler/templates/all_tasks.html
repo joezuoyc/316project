@@ -3,7 +3,7 @@
 {% block content %}
 
 	{% for task in tasks.items %}
-        <h5>Task</h5>
+        <h6>Task</h6>
         <article class="media content-section">
           <img class = "rounded-circle article-img" src = "{{ url_for('static', filename = 'profile_pics/' + task.author.image_file) }}">
           <div class="media-body">

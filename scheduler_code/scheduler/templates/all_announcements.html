@@ -3,7 +3,7 @@
 {% block content %}
 
 	{% for announcement in announcements.items %}
-        <h5>Announcement</h5>
+        <h6>Announcement</h6>
         <article class="media content-section">
           <img class = "rounded-circle article-img" src = "{{ url_for('static', filename = 'profile_pics/' + announcement.author.image_file) }}">
           <div class="media-body">
