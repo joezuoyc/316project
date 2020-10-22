@@ -1,0 +1,37 @@
+{% extends "layout_main.html" %}
+
+{% block content %}
+
+
+    {% for task in tasks %}
+        <article class="media content-section">
+          <div class="media-body">
+            <div class="article-metadata">
+              <a class="mr-2" href="#">{{ task.author.username }}</a>
+              <small class="text-muted">{{task.date_posted.strftime('%m-%d-%Y') }}</small>
+            </div>
+            <h5><a class="article-title" href="{{url_for('task', task_id = task.id)}}">{{ task.title }}</a></h5>
+            <p class="article-content">{{ task.content }}</p>
+          </div>
+        </article>
+  {% endfor  %} 
+
+{% endblock content  %}
+
+{% block content2 %}
+
+
+    {% for announcement in announcements %}
+        <article class="media content-section">
+          <div class="media-body">
+            <div class="article-metadata">
+              <a class="mr-2" href="#">{{ announcement.author.username }}</a>
+              <small class="text-muted">{{announcement.date_posted.strftime('%m-%d-%Y') }}</small>
+            </div>
+            <h5><a class="article-title" href="{{url_for('announcement', announcement_id = announcement.id)}}">{{ announcement.title }}</a></h5>
+            <p class="article-content">{{ announcement.content }}</p>
+          </div>
+        </article>
+  {% endfor  %} 
+
+{% endblock content2  %}
