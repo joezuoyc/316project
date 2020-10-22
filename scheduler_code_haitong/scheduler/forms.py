@@ -33,7 +33,7 @@ class LoginForm(FlaskForm):
 	email = StringField('Email', validators = 
 					[DataRequired(), Email() ])
 	password = PasswordField('Password', validators = [DataRequired()] )
-	remember = BooleanField('remeber me')
+	remember = BooleanField('remember me')
 	submit = SubmitField('Login')
 
 
@@ -68,5 +68,13 @@ class AnnouncementForm(FlaskForm):
 class TaskForm(FlaskForm):
 	title = StringField('Title', validators = [DataRequired()])
 	content = TextAreaField('Content', validators = [DataRequired()])
+	content = TextAreaField('Content', validators = [DataRequired()])
+	submit = SubmitField('Post')
+
+class PollForm(FlaskForm):
+	title = StringField('Title of your poll', validators = [DataRequired()])
+	question = StringField('Your question for the poll', validators = [DataRequired()])
+	option1 = StringField('Option 1', validators = [DataRequired()])
+	option2 = StringField('Option 2', validators = [DataRequired()])
 	submit = SubmitField('Post')
 

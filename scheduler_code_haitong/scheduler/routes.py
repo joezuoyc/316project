@@ -1,8 +1,8 @@
   
 from flask import render_template, url_for, flash, redirect, request, abort
 from scheduler import app, db, bcrypt
-from scheduler.forms import RegistrationForm, LoginForm, UpdateAccountForm, AnnouncementForm, TaskForm
-from scheduler.models import User, Announcement, Task
+from scheduler.forms import RegistrationForm, LoginForm, UpdateAccountForm, AnnouncementForm, TaskForm, PollForm
+from scheduler.models import User, Announcement, Task, Poll
 from flask_login import login_user, current_user, logout_user, login_required
 import secrets
 import os
@@ -185,14 +185,40 @@ def delete_announcement(announcement_id):
 @app.route("/poll/new", methods=['GET', 'POST'])
 @login_required
 def new_poll():
-	form = AnnouncementForm()
+	form = PollForm()
 	if form.validate_on_submit():
-		poll = Poll(title = form.title.data, content = form.content.data, author = current_user)
+		poll = Poll(title = form.title.data, 
+						author = current_user, question = form.question.data, 
+						option1 = form.option1.data, option2 = form.option2.data)
 		db.session.add(poll)
 		db.session.commit()
 		flash('Your poll has been created', 'success')
 		return redirect(url_for('main'))
 	return render_template('new_poll.html', title='New poll', form = form, legend = 'New Poll')
+
+@app.route("/polls/<poll_id>")
+def poll(poll_id):
+	poll = Poll.query.get_or_404(poll_id)
+	return render_template('poll.html', title= poll.title, poll = poll)
+
+@app.route("/all_polls", methods=['GET', 'POST'])
+def all_polls():
+	page = request.args.get('page', 1, type = int)
+	polls = Poll.query.paginate(per_page = 5)
+	return render_template('all_polls.html', polls =polls, title = 'All polls')
+
+@app.route("/polls/<int:poll_id>/delete", methods=['POST'])
+@login_required
+def delete_poll(poll_id):
+    poll = Poll.query.get_or_404(poll_id)
+    if poll.author != current_user:
+        abort(403)
+    db.session.delete(poll)
+    db.session.commit()
+    flash('Your poll has been deleted!', 'success')
+    return redirect(url_for('main'))	
+
+
 
 
 @app.route("/all_tasks", methods=['GET', 'POST'])
