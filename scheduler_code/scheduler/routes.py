@@ -8,6 +8,30 @@ import secrets
 import os
 from PIL import Image
 
+# posts = [
+
+# {
+
+# 	'author':'atsushi', 
+# 	'title':'blog post 1',
+# 	'date': 'Oct 3rd 2020',
+# 	'content':'test1'
+
+# },
+
+
+# {
+
+# 	'author':'hanyca', 
+# 	'title':'blog post 2',
+# 	'date': 'Oct 3rd 2020',
+# 	'content':'test2'
+
+# }
+
+# ]
+
+
 
 
 @app.route('/') # home page of the website, login here
@@ -18,8 +42,7 @@ def home():
 def main():
 	page = request.args.get('page', 1, type = int)
 	announcements = Announcement.query.paginate(per_page = 5)
-	tasks = Task.query.all()
-	return render_template('main.html', announcements =announcements, tasks = tasks, title = 'Main')
+	return render_template('main.html', announcements =announcements, title = 'Main')
 
 
 @app.route('/about')
@@ -101,26 +124,29 @@ def account():
 
 
 
+@app.route("/all_announcements", methods=['GET', 'POST'])
+def all_announcements():
+	page = request.args.get('page', 1, type = int)
+	announcements = Announcement.query.paginate(per_page = 5)
+	return render_template('all_announcements.html', announcements =announcements, title = 'All announcements')
+
 
 @app.route("/announcements/new", methods=['GET', 'POST'])
 @login_required
 def new_announcement():
 	form = AnnouncementForm()
 	if form.validate_on_submit():
-		announcement = Announcement(title = form.title.data, 
-			content = form.content.data, author = current_user)
+		announcement = Announcement(title = form.title.data, content = form.content.data, author = current_user)
 		db.session.add(announcement)
 		db.session.commit()
 		flash('Your accoucement has been created', 'success')
 		return redirect(url_for('main'))
-	return render_template('new_announcement.html', 
-		title='New accouncement', form = form, legend = 'New Announcement')
+	return render_template('new_announcement.html', title='New accouncement', form = form, legend = 'New Announcement')
 
 @app.route("/announcements/<announcement_id>")
 def announcement(announcement_id):
 	announcement = Announcement.query.get_or_404(announcement_id)
-	return render_template('announcement.html', 
-		title= announcement.title, announcement = announcement)
+	return render_template('announcement.html', title= announcement.title, announcement = announcement)
 
 
 # Update announcement content
@@ -144,7 +170,7 @@ def update_announcement(announcement_id):
 	return render_template('new_announcement.html', title= 'Update Annoucnement' , 
 								form = form, legend = 'Update Annoucnement')
 
-@app.route("/announcement/<int:announcement_id>/delete", methods=['POST'])
+@app.route("/announcements/<int:announcement_id>/delete", methods=['POST'])
 @login_required
 def delete_announcement(announcement_id):
     announcement = Announcement.query.get_or_404(announcement_id)
@@ -154,6 +180,25 @@ def delete_announcement(announcement_id):
     db.session.commit()
     flash('Your announcement has been deleted!', 'success')
     return redirect(url_for('main'))
+
+@app.route("/poll/new", methods=['GET', 'POST'])
+@login_required
+def new_poll():
+	form = AnnouncementForm()
+	if form.validate_on_submit():
+		poll = Poll(title = form.title.data, content = form.content.data, author = current_user)
+		db.session.add(poll)
+		db.session.commit()
+		flash('Your poll has been created', 'success')
+		return redirect(url_for('main'))
+	return render_template('new_poll.html', title='New poll', form = form, legend = 'New Poll')
+
+
+@app.route("/all_tasks", methods=['GET', 'POST'])
+def all_tasks():
+	page = request.args.get('page', 1, type = int)
+	tasks = Task.query.paginate(per_page = 5)
+	return render_template('all_tasks.html', tasks =tasks, title = 'All tasks')
 
 
 @app.route("/tasks/new", methods=['GET', 'POST'])
@@ -173,3 +218,6 @@ def new_task():
 def task(task_id):
 	task = Task.query.get_or_404(task_id)
 	return render_template('task.html', title= task.title, task = task)
+
+#db.create_all()
+#db.session.commit()
