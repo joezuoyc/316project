@@ -9,9 +9,9 @@ from scheduler.models import User
 class RegistrationForm(FlaskForm):
 	username = StringField('Username', validators = 
 					[DataRequired(),Length(min = 2, max = 20) ])
-	# role = SelectField('Role', [DataRequired()],
- #                        choices=[('Employee', 'employee'),
- #                                 ('Manager', 'manager')])
+	role = SelectField('Role', [DataRequired()],
+                        choices=[('Employee', 'employee'),
+                                 ('Manager', 'manager')])
 	email = StringField('Email', validators = 
 					[DataRequired(), Email() ])
 	password = PasswordField('Password', validators = [DataRequired()] )

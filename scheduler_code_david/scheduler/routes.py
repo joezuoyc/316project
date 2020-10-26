@@ -57,10 +57,10 @@ def register():
 		return redirect(url_for('main'))
 	if form.validate_on_submit():
 		hashed_pw = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-		# manager = False
-		# if form.role.data == "manager":
-		# 	manager = True
-		user = User(username=form.username.data, email=form.email.data, password=hashed_pw)
+		manager = False
+		if form.role.data == "manager":
+			manager = True
+		user = User(username=form.username.data, email=form.email.data, password=hashed_pw, is_manager=manager)
 		db.session.add(user)
 		db.session.commit()		
 		flash(f'Account created for {form.username.data}!', 'success')
