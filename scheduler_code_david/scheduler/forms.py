@@ -10,8 +10,8 @@ class RegistrationForm(FlaskForm):
 	username = StringField('Username', validators = 
 					[DataRequired(),Length(min = 2, max = 20) ])
 	role = SelectField('Role', [DataRequired()],
-                        choices=[('Employee', 'employee'),
-                                 ('Manager', 'manager')])
+                        choices=[('employee', 'Employee'),
+                                 ('manager', 'Manager')])
 	email = StringField('Email', validators = 
 					[DataRequired(), Email() ])
 	password = PasswordField('Password', validators = [DataRequired()] )
